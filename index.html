@@ -30,6 +30,11 @@
     .trend-up { color: #4ade80; }
     .trend-down { color: #f87171; }
     .section-header { color: #94a3b8; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 12px; }
+    .period-btn { padding: 4px 14px; border-radius: 6px; font-size: 12px; font-weight: 500; cursor: pointer; border: 1px solid transparent; color: #64748b; background: transparent; transition: all 0.15s; }
+    .period-btn:hover:not(.disabled) { color: #e2e8f0; }
+    .period-btn.active { background: #4f46e5; color: white; }
+    .period-btn.disabled { opacity: 0.35; cursor: not-allowed; }
+    .source-dot { width: 6px; height: 6px; border-radius: 50%; display: inline-block; }
   </style>
 </head>
 <body class="min-h-screen">
@@ -38,37 +43,48 @@
   <nav class="border-b border-[#2d3148] px-8 py-4 flex items-center justify-between sticky top-0 z-50" style="background:#0f1117;">
     <div class="flex items-center gap-3">
       <div class="w-8 h-8 rounded-lg flex items-center justify-center" style="background:#4f46e5;">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5">
-          <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/>
-        </svg>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>
       </div>
       <div>
         <div class="font-semibold text-sm text-white">acoustic-curtains.com</div>
         <div class="text-xs text-slate-500">Quiet Curtains</div>
       </div>
     </div>
-    <div class="flex items-center gap-4">
-      <div class="text-xs text-slate-500">Last updated <span class="text-slate-300">May 15, 2026</span></div>
-      <div class="text-xs px-3 py-1 rounded-full" style="background:#1e293b; border:1px solid #334155; color:#94a3b8;">
-        90-day view
+    <div class="flex items-center gap-5">
+      <div class="flex items-center gap-3 text-xs text-slate-500">
+        <span class="flex items-center gap-1.5"><span class="source-dot" style="background:#4ade80;"></span>GA4</span>
+        <span class="flex items-center gap-1.5"><span class="source-dot" style="background:#4ade80;"></span>Search Console</span>
+        <span class="flex items-center gap-1.5"><span class="source-dot" style="background:#4ade80;"></span>SEMrush</span>
       </div>
+      <div class="text-xs text-slate-500">Updated <span class="text-slate-300">May 18, 2026</span></div>
       <div class="w-7 h-7 rounded-full flex items-center justify-center text-xs font-semibold" style="background:#4f46e5;">QC</div>
     </div>
   </nav>
 
   <div class="px-8 py-6 max-w-7xl mx-auto">
 
-    <!-- Page Header -->
+    <!-- Header -->
     <div class="flex items-center justify-between mb-6">
       <div>
         <h1 class="text-xl font-semibold text-white">Marketing Dashboard</h1>
-        <p class="text-sm text-slate-500 mt-0.5">Feb 15 – May 15, 2026 &nbsp;·&nbsp; 90 days</p>
+        <p class="text-sm text-slate-500 mt-0.5" id="period-label">Apr 18 – May 18, 2026 &nbsp;·&nbsp; 30 days</p>
       </div>
-      <div class="flex gap-2 text-sm">
-        <button onclick="setTab('overview')" id="tab-overview" class="px-4 py-1.5 tab-active text-sm font-medium">Overview</button>
-        <button onclick="setTab('seo')" id="tab-seo" class="px-4 py-1.5 tab-inactive text-sm font-medium">SEO</button>
-        <button onclick="setTab('pages')" id="tab-pages" class="px-4 py-1.5 tab-inactive text-sm font-medium">Pages</button>
-        <button onclick="setTab('actions')" id="tab-actions" class="px-4 py-1.5 tab-inactive text-sm font-medium">Actions</button>
+      <div class="flex items-center gap-3">
+        <!-- Period selector -->
+        <div class="flex items-center gap-0.5 p-1 rounded-lg" style="background:#1a1d27; border:1px solid #2d3148;">
+          <button onclick="setPeriod('7d')" class="period-btn disabled" title="Re-run report for 7-day data">7D</button>
+          <button onclick="setPeriod('14d')" class="period-btn disabled" title="Re-run report for 14-day data">14D</button>
+          <button onclick="setPeriod('30d')" id="pbtn-30d" class="period-btn active">30D</button>
+          <button onclick="setPeriod('60d')" class="period-btn disabled" title="Re-run report for 60-day data">60D</button>
+          <button onclick="setPeriod('90d')" id="pbtn-90d" class="period-btn">90D</button>
+        </div>
+        <!-- Tab selector -->
+        <div class="flex gap-1.5 text-sm">
+          <button onclick="setTab('overview')" id="tab-overview" class="px-4 py-1.5 tab-active text-sm font-medium">Overview</button>
+          <button onclick="setTab('seo')" id="tab-seo" class="px-4 py-1.5 tab-inactive text-sm font-medium">SEO</button>
+          <button onclick="setTab('pages')" id="tab-pages" class="px-4 py-1.5 tab-inactive text-sm font-medium">Pages</button>
+          <button onclick="setTab('actions')" id="tab-actions" class="px-4 py-1.5 tab-inactive text-sm font-medium">Actions</button>
+        </div>
       </div>
     </div>
 
@@ -79,47 +95,44 @@
       <div class="grid grid-cols-6 gap-4 mb-6">
         <div class="kpi-card col-span-1">
           <div class="section-header">Sessions</div>
-          <div class="text-2xl font-bold text-white">12,228</div>
-          <div class="flex items-center gap-1 mt-1">
-            <span class="text-xs trend-up">↑ 3.1%</span>
-            <span class="text-xs text-slate-500">vs prior 90d</span>
+          <div class="text-2xl font-bold text-white" id="kpi-sessions">3,840</div>
+          <div class="flex items-center gap-1 mt-1" id="kpi-sessions-sub">
+            <span class="text-xs trend-down">↓ vs prior 30d</span>
           </div>
         </div>
         <div class="kpi-card col-span-1">
           <div class="section-header">Conversions</div>
-          <div class="text-2xl font-bold text-white">288</div>
-          <div class="flex items-center gap-1 mt-1">
-            <span class="text-xs trend-up">↑ 5.1%</span>
-            <span class="text-xs text-slate-500">vs prior 90d</span>
+          <div class="text-2xl font-bold text-white" id="kpi-conv">98</div>
+          <div class="flex items-center gap-1 mt-1" id="kpi-conv-sub">
+            <span class="text-xs text-slate-500">GA4 events</span>
           </div>
         </div>
         <div class="kpi-card col-span-1">
           <div class="section-header">Conv Rate</div>
-          <div class="text-2xl font-bold text-white">2.4%</div>
-          <div class="flex items-center gap-1 mt-1">
-            <span class="text-xs trend-up">↑ 0.2pp</span>
-            <span class="text-xs text-slate-500">vs prior 90d</span>
+          <div class="text-2xl font-bold text-white" id="kpi-cvr">2.55%</div>
+          <div class="flex items-center gap-1 mt-1" id="kpi-cvr-sub">
+            <span class="text-xs trend-up">↑ vs prior 90d 2.4%</span>
           </div>
         </div>
         <div class="kpi-card col-span-1">
           <div class="section-header">Organic Clicks</div>
-          <div class="text-2xl font-bold text-white">2,343</div>
-          <div class="flex items-center gap-1 mt-1">
+          <div class="text-2xl font-bold text-white" id="kpi-clicks">709</div>
+          <div class="flex items-center gap-1 mt-1" id="kpi-clicks-sub">
             <span class="text-xs text-slate-500">Search Console</span>
           </div>
         </div>
         <div class="kpi-card col-span-1">
-          <div class="section-header">Avg Position</div>
-          <div class="text-2xl font-bold text-white">10.4</div>
-          <div class="flex items-center gap-1 mt-1">
-            <span class="text-xs badge-yellow px-1.5 py-0.5 rounded text-xs">Page 1 edge</span>
+          <div class="section-header">Impressions</div>
+          <div class="text-2xl font-bold text-white" id="kpi-imp">68.2K</div>
+          <div class="flex items-center gap-1 mt-1" id="kpi-imp-sub">
+            <span class="text-xs badge-yellow px-1.5 py-0.5 rounded text-xs">1.04% CTR</span>
           </div>
         </div>
         <div class="kpi-card col-span-1">
-          <div class="section-header">Domain Rank</div>
-          <div class="text-2xl font-bold text-white">1.03M</div>
-          <div class="flex items-center gap-1 mt-1">
-            <span class="text-xs badge-red px-1.5 py-0.5 rounded text-xs">Low DA</span>
+          <div class="section-header">Avg Position</div>
+          <div class="text-2xl font-bold text-white" id="kpi-pos">12.8</div>
+          <div class="flex items-center gap-1 mt-1" id="kpi-pos-sub">
+            <span class="text-xs badge-red px-1.5 py-0.5 rounded text-xs">Page 2 edge</span>
           </div>
         </div>
       </div>
@@ -127,14 +140,13 @@
       <!-- Charts Row -->
       <div class="grid grid-cols-3 gap-4 mb-6">
 
-        <!-- Monthly Traffic -->
+        <!-- Daily Traffic Line Chart -->
         <div class="card p-5 col-span-2">
           <div class="flex items-center justify-between mb-4">
-            <div class="section-header mb-0">Monthly Sessions</div>
-            <div class="flex gap-3 text-xs">
-              <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-sm inline-block" style="background:#4f46e5;"></span> Paid</span>
-              <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-sm inline-block" style="background:#06b6d4;"></span> Organic</span>
-              <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-sm inline-block" style="background:#8b5cf6;"></span> Direct</span>
+            <div class="section-header mb-0" id="chart-title">Daily Traffic — Last 30 Days</div>
+            <div class="flex gap-4 text-xs">
+              <span class="flex items-center gap-1.5"><span class="w-3 h-0.5 inline-block rounded" style="background:#4f46e5;"></span> Sessions</span>
+              <span class="flex items-center gap-1.5"><span class="w-3 h-0.5 inline-block rounded" style="background:#06b6d4;"></span> Organic Clicks</span>
             </div>
           </div>
           <canvas id="trafficChart" height="120"></canvas>
@@ -144,23 +156,12 @@
         <div class="card p-5">
           <div class="section-header">Channel Mix</div>
           <canvas id="channelChart" height="160"></canvas>
-          <div class="mt-3 space-y-1.5">
-            <div class="flex justify-between text-xs">
-              <span class="text-slate-400">Paid Search</span>
-              <span class="text-white font-medium">36.6% · 131 conv</span>
-            </div>
-            <div class="flex justify-between text-xs">
-              <span class="text-slate-400">Organic</span>
-              <span class="text-white font-medium">29.3% · 70 conv</span>
-            </div>
-            <div class="flex justify-between text-xs">
-              <span class="text-slate-400">Direct</span>
-              <span class="text-white font-medium">20.6% · 49 conv</span>
-            </div>
-            <div class="flex justify-between text-xs">
-              <span class="text-slate-400">Other</span>
-              <span class="text-white font-medium">13.5% · 38 conv</span>
-            </div>
+          <div class="mt-3 space-y-1.5" id="channel-legend">
+            <div class="flex justify-between text-xs"><span class="text-slate-400">Paid Search</span><span class="text-white font-medium">35.1% · 40 conv</span></div>
+            <div class="flex justify-between text-xs"><span class="text-slate-400">Organic</span><span class="text-white font-medium">29.3% · 26 conv</span></div>
+            <div class="flex justify-between text-xs"><span class="text-slate-400">Direct</span><span class="text-white font-medium">22.8% · 17 conv</span></div>
+            <div class="flex justify-between text-xs"><span class="text-slate-400">Cross-network</span><span class="text-white font-medium">8.8% · 10 conv</span></div>
+            <div class="flex justify-between text-xs"><span class="text-slate-400">Other</span><span class="text-white font-medium">4.0% · 5 conv</span></div>
           </div>
         </div>
       </div>
@@ -168,36 +169,36 @@
       <!-- Conversion Rate by Channel -->
       <div class="card p-5 mb-6">
         <div class="section-header">Conversion Rate by Channel</div>
-        <div class="grid grid-cols-6 gap-4">
+        <div class="grid grid-cols-6 gap-4" id="cvr-by-channel">
           <div class="text-center">
-            <div class="text-lg font-bold text-white">2.9%</div>
-            <div class="text-xs text-slate-400 mt-1">Paid Search</div>
-            <div class="mt-2 h-1 rounded-full" style="background:#4f46e5; width:80%;margin:0 auto;"></div>
-          </div>
-          <div class="text-center">
-            <div class="text-lg font-bold pos-good">4.2%</div>
+            <div class="text-lg font-bold pos-good">4.4%</div>
             <div class="text-xs text-slate-400 mt-1">Referral 🏆</div>
             <div class="mt-2 h-1 rounded-full" style="background:#22c55e; width:100%;margin:0 auto;"></div>
           </div>
           <div class="text-center">
-            <div class="text-lg font-bold text-white">1.9%</div>
-            <div class="text-xs text-slate-400 mt-1">Organic</div>
-            <div class="mt-2 h-1 rounded-full" style="background:#06b6d4; width:55%;margin:0 auto;"></div>
+            <div class="text-lg font-bold text-white">3.0%</div>
+            <div class="text-xs text-slate-400 mt-1">Paid Search</div>
+            <div class="mt-2 h-1 rounded-full" style="background:#4f46e5; width:67%;margin:0 auto;"></div>
           </div>
           <div class="text-center">
-            <div class="text-lg font-bold text-white">1.9%</div>
+            <div class="text-lg font-bold text-white">3.0%</div>
             <div class="text-xs text-slate-400 mt-1">Cross-net</div>
-            <div class="mt-2 h-1 rounded-full" style="background:#8b5cf6; width:55%;margin:0 auto;"></div>
+            <div class="mt-2 h-1 rounded-full" style="background:#8b5cf6; width:67%;margin:0 auto;"></div>
+          </div>
+          <div class="text-center">
+            <div class="text-lg font-bold text-white">2.3%</div>
+            <div class="text-xs text-slate-400 mt-1">Organic</div>
+            <div class="mt-2 h-1 rounded-full" style="background:#06b6d4; width:52%;margin:0 auto;"></div>
           </div>
           <div class="text-center">
             <div class="text-lg font-bold text-white">1.9%</div>
             <div class="text-xs text-slate-400 mt-1">Direct</div>
-            <div class="mt-2 h-1 rounded-full" style="background:#64748b; width:55%;margin:0 auto;"></div>
+            <div class="mt-2 h-1 rounded-full" style="background:#64748b; width:44%;margin:0 auto;"></div>
           </div>
           <div class="text-center">
             <div class="text-lg font-bold pos-bad">0.0%</div>
             <div class="text-xs text-slate-400 mt-1">Social</div>
-            <div class="mt-2 h-1 rounded-full" style="background:#ef4444; width:5%;margin:0 auto;"></div>
+            <div class="mt-2 h-1 rounded-full" style="background:#ef4444; width:2%;margin:0 auto;"></div>
           </div>
         </div>
       </div>
@@ -206,18 +207,18 @@
       <div class="grid grid-cols-3 gap-4">
         <div class="card p-4 priority-red">
           <div class="text-xs font-semibold text-red-400 mb-2">🔴 CRITICAL — Fix Now</div>
-          <div class="text-sm text-white font-medium">Direct Bounce Rate 66.5%</div>
-          <div class="text-xs text-slate-400 mt-1">Brand-aware visitors bouncing at 2x organic rate. Mobile/landing page issue.</div>
+          <div class="text-sm text-white font-medium">Direct Bounce Rate 68.3%</div>
+          <div class="text-xs text-slate-400 mt-1">Up from 66.5% last period. Brand-aware visitors bouncing at 2x organic rate. Mobile/landing page issue.</div>
         </div>
-        <div class="card p-4 priority-red">
-          <div class="text-xs font-semibold text-red-400 mb-2">🔴 CRITICAL — Big Win</div>
-          <div class="text-sm text-white font-medium">Homepage: 138K impressions, 1.1% CTR</div>
-          <div class="text-xs text-slate-400 mt-1">Fix title/meta → could 6x organic homepage traffic overnight.</div>
+        <div class="card p-4 priority-green">
+          <div class="text-xs font-semibold text-green-400 mb-2">🟢 MONEY PAGE — Replicate</div>
+          <div class="text-sm text-white font-medium">/custom/residential-curtains/ 11.2% CVR</div>
+          <div class="text-xs text-slate-400 mt-1">57 conversions from 508 sessions. Best page on the site by far — study and replicate for other landing pages.</div>
         </div>
         <div class="card p-4 priority-yellow">
           <div class="text-xs font-semibold text-yellow-400 mb-2">🟡 OPPORTUNITY</div>
-          <div class="text-sm text-white font-medium">"soundproof curtains" at position #17</div>
-          <div class="text-xs text-slate-400 mt-1">5,400/mo search volume. Push to page 1 → +500 clicks/mo estimated.</div>
+          <div class="text-sm text-white font-medium">"soundproof curtains" — 5,318 imp, pos 13.3</div>
+          <div class="text-xs text-slate-400 mt-1">5,400/mo volume. Only 29 clicks from 5K impressions. Push to page 1 → +400 clicks/mo estimated.</div>
         </div>
       </div>
 
@@ -230,33 +231,33 @@
       <div class="grid grid-cols-4 gap-4 mb-6">
         <div class="kpi-card">
           <div class="section-header">Organic Clicks</div>
-          <div class="text-2xl font-bold text-white">2,343</div>
-          <div class="text-xs text-slate-500 mt-1">90 days</div>
+          <div class="text-2xl font-bold text-white" id="seo-clicks">709</div>
+          <div class="text-xs text-slate-500 mt-1" id="seo-clicks-sub">30 days · Search Console</div>
         </div>
         <div class="kpi-card">
           <div class="section-header">Impressions</div>
-          <div class="text-2xl font-bold text-white">291K</div>
-          <div class="text-xs text-slate-500 mt-1">90 days</div>
+          <div class="text-2xl font-bold text-white" id="seo-imp">68.2K</div>
+          <div class="text-xs text-slate-500 mt-1" id="seo-imp-sub">30 days</div>
         </div>
         <div class="kpi-card">
           <div class="section-header">Avg CTR</div>
-          <div class="text-2xl font-bold text-white">0.80%</div>
+          <div class="text-2xl font-bold text-white" id="seo-ctr">1.04%</div>
           <div class="text-xs badge-red px-1.5 py-0.5 rounded mt-1 inline-block text-xs">Below target 3%</div>
         </div>
         <div class="kpi-card">
-          <div class="section-header">Organic Keywords</div>
-          <div class="text-2xl font-bold text-white">1,093</div>
-          <div class="text-xs text-slate-500 mt-1">SEMrush · Target: 2,000</div>
+          <div class="section-header">Avg Position</div>
+          <div class="text-2xl font-bold text-white" id="seo-pos">12.8</div>
+          <div class="text-xs text-slate-500 mt-1">Weighted by impressions</div>
         </div>
       </div>
 
       <!-- Keyword Table -->
       <div class="card p-5 mb-6">
         <div class="flex items-center justify-between mb-4">
-          <div class="section-header mb-0">Top Keywords — Last 90 Days</div>
+          <div class="section-header mb-0" id="kw-table-title">Top Keywords — Last 30 Days</div>
           <div class="text-xs text-slate-500">Source: Google Search Console</div>
         </div>
-        <table class="w-full text-sm">
+        <table class="w-full text-sm" id="keyword-table">
           <thead>
             <tr class="text-left border-b border-[#2d3148]">
               <th class="pb-3 text-xs text-slate-400 font-medium">Keyword</th>
@@ -264,84 +265,10 @@
               <th class="pb-3 text-xs text-slate-400 font-medium text-right">Impressions</th>
               <th class="pb-3 text-xs text-slate-400 font-medium text-right">CTR</th>
               <th class="pb-3 text-xs text-slate-400 font-medium text-right">Position</th>
-              <th class="pb-3 text-xs text-slate-400 font-medium text-right">Vol/mo</th>
               <th class="pb-3 text-xs text-slate-400 font-medium">Status</th>
             </tr>
           </thead>
-          <tbody class="divide-y divide-[#2d3148]">
-            <tr class="py-3">
-              <td class="py-3 text-white font-medium">acoustic curtains</td>
-              <td class="py-3 text-right text-slate-300">271</td>
-              <td class="py-3 text-right text-slate-300">8,910</td>
-              <td class="py-3 text-right text-slate-300">3.0%</td>
-              <td class="py-3 text-right pos-mid font-semibold">#11.7</td>
-              <td class="py-3 text-right text-slate-400">1,600</td>
-              <td class="py-3"><span class="badge-yellow px-2 py-0.5 rounded text-xs">Push to #5</span></td>
-            </tr>
-            <tr>
-              <td class="py-3 text-white font-medium">quiet curtains</td>
-              <td class="py-3 text-right text-slate-300">136</td>
-              <td class="py-3 text-right text-slate-300">604</td>
-              <td class="py-3 text-right pos-good font-semibold">22.5%</td>
-              <td class="py-3 text-right pos-good font-semibold">#2.1</td>
-              <td class="py-3 text-right text-slate-400">140</td>
-              <td class="py-3"><span class="badge-green px-2 py-0.5 rounded text-xs">Ranking #1 ✓</span></td>
-            </tr>
-            <tr>
-              <td class="py-3 text-white font-medium">soundproof curtains</td>
-              <td class="py-3 text-right text-slate-300">105</td>
-              <td class="py-3 text-right pos-bad font-semibold">16,102</td>
-              <td class="py-3 text-right text-slate-300">0.65%</td>
-              <td class="py-3 text-right pos-bad font-semibold">#12.1</td>
-              <td class="py-3 text-right text-slate-400">5,400</td>
-              <td class="py-3"><span class="badge-red px-2 py-0.5 rounded text-xs">🔴 Page 2</span></td>
-            </tr>
-            <tr>
-              <td class="py-3 text-white font-medium">sound proof curtains</td>
-              <td class="py-3 text-right text-slate-300">46</td>
-              <td class="py-3 text-right text-slate-300">6,129</td>
-              <td class="py-3 text-right text-slate-300">0.75%</td>
-              <td class="py-3 text-right pos-mid font-semibold">#9.7</td>
-              <td class="py-3 text-right text-slate-400">3,600</td>
-              <td class="py-3"><span class="badge-yellow px-2 py-0.5 rounded text-xs">Near page 1</span></td>
-            </tr>
-            <tr>
-              <td class="py-3 text-white font-medium">sound dampening curtains</td>
-              <td class="py-3 text-right text-slate-300">35</td>
-              <td class="py-3 text-right text-slate-300">8,757</td>
-              <td class="py-3 text-right text-slate-300">0.40%</td>
-              <td class="py-3 text-right pos-bad font-semibold">#13.1</td>
-              <td class="py-3 text-right text-slate-400">5,400</td>
-              <td class="py-3"><span class="badge-red px-2 py-0.5 rounded text-xs">🔴 Page 2</span></td>
-            </tr>
-            <tr>
-              <td class="py-3 text-white font-medium">sound blocking curtains</td>
-              <td class="py-3 text-right text-slate-300">26</td>
-              <td class="py-3 text-right text-slate-300">3,006</td>
-              <td class="py-3 text-right text-slate-300">0.86%</td>
-              <td class="py-3 text-right pos-mid font-semibold">#10.5</td>
-              <td class="py-3 text-right text-slate-400">—</td>
-              <td class="py-3"><span class="badge-yellow px-2 py-0.5 rounded text-xs">Near page 1</span></td>
-            </tr>
-            <tr>
-              <td class="py-3 text-white font-medium">noise cancelling curtains</td>
-              <td class="py-3 text-right text-slate-300">10</td>
-              <td class="py-3 text-right text-slate-300">2,215</td>
-              <td class="py-3 text-right text-slate-300">0.45%</td>
-              <td class="py-3 text-right pos-bad font-semibold">#14.5</td>
-              <td class="py-3 text-right text-slate-400">2,900</td>
-              <td class="py-3"><span class="badge-red px-2 py-0.5 rounded text-xs">🔴 Page 2</span></td>
-            </tr>
-            <tr>
-              <td class="py-3 text-white font-medium">acoustic curtains commercial</td>
-              <td class="py-3 text-right text-slate-300">8</td>
-              <td class="py-3 text-right text-slate-300">59</td>
-              <td class="py-3 text-right pos-good font-semibold">13.6%</td>
-              <td class="py-3 text-right pos-good font-semibold">#3.6</td>
-              <td class="py-3 text-right text-slate-400">—</td>
-              <td class="py-3"><span class="badge-green px-2 py-0.5 rounded text-xs">Strong ✓</span></td>
-            </tr>
-          </tbody>
+          <tbody id="kw-tbody" class="divide-y divide-[#2d3148]"></tbody>
         </table>
       </div>
 
@@ -356,7 +283,7 @@
     <div id="view-pages" class="hidden">
       <div class="card p-5">
         <div class="flex items-center justify-between mb-4">
-          <div class="section-header mb-0">Top Pages — Last 90 Days</div>
+          <div class="section-header mb-0" id="pages-table-title">Top Pages — Last 30 Days</div>
           <div class="text-xs text-slate-500">Source: Google Analytics 4</div>
         </div>
         <table class="w-full text-sm">
@@ -364,24 +291,13 @@
             <tr class="text-left border-b border-[#2d3148]">
               <th class="pb-3 text-xs text-slate-400 font-medium">Page</th>
               <th class="pb-3 text-xs text-slate-400 font-medium text-right">Sessions</th>
-              <th class="pb-3 text-xs text-slate-400 font-medium text-right">Users</th>
               <th class="pb-3 text-xs text-slate-400 font-medium text-right">Bounce Rate</th>
               <th class="pb-3 text-xs text-slate-400 font-medium text-right">Avg Duration</th>
+              <th class="pb-3 text-xs text-slate-400 font-medium text-right">Conversions</th>
               <th class="pb-3 text-xs text-slate-400 font-medium">Health</th>
             </tr>
           </thead>
-          <tbody class="divide-y divide-[#2d3148]">
-            <tr><td class="py-3 text-white font-medium">/  <span class="text-slate-500 font-normal">(Homepage)</span></td><td class="py-3 text-right">5,864</td><td class="py-3 text-right">4,978</td><td class="py-3 text-right pos-good">31.7%</td><td class="py-3 text-right text-slate-300">1:02</td><td class="py-3"><span class="badge-green px-2 py-0.5 rounded text-xs">Good</span></td></tr>
-            <tr><td class="py-3 text-white font-medium">/curtains/sound-blocking/</td><td class="py-3 text-right">3,670</td><td class="py-3 text-right">2,845</td><td class="py-3 text-right pos-good">20.8%</td><td class="py-3 text-right text-slate-300">1:27</td><td class="py-3"><span class="badge-green px-2 py-0.5 rounded text-xs">Excellent</span></td></tr>
-            <tr><td class="py-3 text-white font-medium">/curtains/acoustic-curtains/</td><td class="py-3 text-right">2,190</td><td class="py-3 text-right">1,735</td><td class="py-3 text-right pos-good">24.7%</td><td class="py-3 text-right text-slate-300">1:39</td><td class="py-3"><span class="badge-green px-2 py-0.5 rounded text-xs">Excellent</span></td></tr>
-            <tr><td class="py-3 text-white font-medium">/custom/residential-curtains/</td><td class="py-3 text-right">1,664</td><td class="py-3 text-right">1,159</td><td class="py-3 text-right pos-good">21.6%</td><td class="py-3 text-right pos-good font-semibold">2:57</td><td class="py-3"><span class="badge-green px-2 py-0.5 rounded text-xs">Best engagement</span></td></tr>
-            <tr><td class="py-3 text-white font-medium">/landing/acoustic-curtains/</td><td class="py-3 text-right">1,466</td><td class="py-3 text-right">1,348</td><td class="py-3 text-right pos-mid">37.6%</td><td class="py-3 text-right text-slate-300">1:19</td><td class="py-3"><span class="badge-yellow px-2 py-0.5 rounded text-xs">Watch CTR</span></td></tr>
-            <tr><td class="py-3 text-white font-medium">/curtains/commercial-curtains/</td><td class="py-3 text-right">629</td><td class="py-3 text-right">505</td><td class="py-3 text-right pos-good">26.1%</td><td class="py-3 text-right text-slate-300">1:54</td><td class="py-3"><span class="badge-green px-2 py-0.5 rounded text-xs">Good</span></td></tr>
-            <tr><td class="py-3 text-white font-medium">/custom/acoustic-curtains/</td><td class="py-3 text-right">611</td><td class="py-3 text-right">440</td><td class="py-3 text-right pos-good font-semibold">17.3%</td><td class="py-3 text-right text-slate-300">2:37</td><td class="py-3"><span class="badge-green px-2 py-0.5 rounded text-xs">Excellent</span></td></tr>
-            <tr><td class="py-3 text-white font-medium">/lab-tests/</td><td class="py-3 text-right">589</td><td class="py-3 text-right">436</td><td class="py-3 text-right pos-good">25.1%</td><td class="py-3 text-right text-slate-300">2:44</td><td class="py-3"><span class="badge-yellow px-2 py-0.5 rounded text-xs">CTR too low</span></td></tr>
-            <tr><td class="py-3 text-white font-medium">/portfolio/</td><td class="py-3 text-right">476</td><td class="py-3 text-right">415</td><td class="py-3 text-right pos-good font-semibold">12.2%</td><td class="py-3 text-right text-slate-300">1:12</td><td class="py-3"><span class="badge-green px-2 py-0.5 rounded text-xs">Lowest bounce ✓</span></td></tr>
-            <tr><td class="py-3 text-white font-medium">/landing/acoustic-drapes/</td><td class="py-3 text-right">518</td><td class="py-3 text-right">473</td><td class="py-3 text-right pos-mid">34.0%</td><td class="py-3 text-right text-slate-300">1:26</td><td class="py-3"><span class="badge-yellow px-2 py-0.5 rounded text-xs">Monitor</span></td></tr>
-          </tbody>
+          <tbody id="pages-tbody" class="divide-y divide-[#2d3148]"></tbody>
         </table>
       </div>
     </div>
@@ -389,8 +305,6 @@
     <!-- ── ACTIONS TAB ── -->
     <div id="view-actions" class="hidden">
       <div class="grid grid-cols-2 gap-4">
-
-        <!-- Red priority -->
         <div>
           <div class="section-header">🔴 Fix Now — High Impact, Low Effort</div>
           <div class="space-y-3">
@@ -398,7 +312,7 @@
               <div class="flex items-start justify-between">
                 <div>
                   <div class="text-sm font-semibold text-white">Rewrite homepage title + meta description</div>
-                  <div class="text-xs text-slate-400 mt-1">138,366 impressions at 1.1% CTR. Fix meta → 5%+ CTR → 6x organic homepage traffic.</div>
+                  <div class="text-xs text-slate-400 mt-1">138K impressions at 1.1% CTR (90d). Fix meta → 5%+ CTR → 6x organic homepage traffic.</div>
                 </div>
                 <span class="badge-green px-2 py-0.5 rounded text-xs ml-3 shrink-0">High</span>
               </div>
@@ -406,17 +320,8 @@
             <div class="card p-4 priority-red">
               <div class="flex items-start justify-between">
                 <div>
-                  <div class="text-sm font-semibold text-white">Fix /lab-tests/ title tag</div>
-                  <div class="text-xs text-slate-400 mt-1">19,133 impressions at 0.21% CTR, position 7.7. Fix title → 5x the clicks.</div>
-                </div>
-                <span class="badge-green px-2 py-0.5 rounded text-xs ml-3 shrink-0">High</span>
-              </div>
-            </div>
-            <div class="card p-4 priority-red">
-              <div class="flex items-start justify-between">
-                <div>
-                  <div class="text-sm font-semibold text-white">Audit direct traffic bounce rate (66.5%)</div>
-                  <div class="text-xs text-slate-400 mt-1">Brand-aware visitors bouncing at 2x organic rate. Check landing pages + mobile.</div>
+                  <div class="text-sm font-semibold text-white">Audit direct traffic bounce rate — now 68.3%</div>
+                  <div class="text-xs text-slate-400 mt-1">Up from 66.5% last period. 876 direct sessions, only 17 conversions. Check landing pages + mobile.</div>
                 </div>
                 <span class="badge-yellow px-2 py-0.5 rounded text-xs ml-3 shrink-0">Med</span>
               </div>
@@ -425,7 +330,16 @@
               <div class="flex items-start justify-between">
                 <div>
                   <div class="text-sm font-semibold text-white">Google Ads account audit</div>
-                  <div class="text-xs text-slate-400 mt-1">Paid is #1 channel (4,480 sessions). Negative keywords + ad copy test needed.</div>
+                  <div class="text-xs text-slate-400 mt-1">Paid is #1 channel (1,348 sessions, 40 conversions). Negative keywords + ad copy test needed.</div>
+                </div>
+                <span class="badge-green px-2 py-0.5 rounded text-xs ml-3 shrink-0">High</span>
+              </div>
+            </div>
+            <div class="card p-4 priority-red">
+              <div class="flex items-start justify-between">
+                <div>
+                  <div class="text-sm font-semibold text-white">Replicate /custom/residential-curtains/ formula</div>
+                  <div class="text-xs text-slate-400 mt-1">11.2% CVR (57 conv / 508 sessions). Study what makes this page work and apply to other landing pages.</div>
                 </div>
                 <span class="badge-green px-2 py-0.5 rounded text-xs ml-3 shrink-0">High</span>
               </div>
@@ -433,21 +347,20 @@
           </div>
         </div>
 
-        <!-- Yellow + Green priority -->
         <div>
           <div class="section-header">🟡 This Month — SEO + Content</div>
           <div class="space-y-3 mb-6">
             <div class="card p-4 priority-yellow">
-              <div class="text-sm font-semibold text-white">On-page optimization: /curtains/sound-blocking/</div>
-              <div class="text-xs text-slate-400 mt-1">Position 19 in Search Console, 22K impressions. Target keyword density + internal links.</div>
+              <div class="text-sm font-semibold text-white">On-page optimization: "soundproof curtains"</div>
+              <div class="text-xs text-slate-400 mt-1">5,318 impressions in 30d at pos 13.3 — 0.55% CTR. Push to page 1 → est. +400 clicks/mo.</div>
             </div>
             <div class="card p-4 priority-yellow">
-              <div class="text-sm font-semibold text-white">On-page: /curtains/acoustic-curtains/</div>
-              <div class="text-xs text-slate-400 mt-1">Position 20, 29K impressions. Same treatment as above.</div>
+              <div class="text-sm font-semibold text-white">On-page optimization: "sound dampening curtains"</div>
+              <div class="text-xs text-slate-400 mt-1">2,047 impressions at pos 14.9. Same treatment — 5,400/mo search volume.</div>
             </div>
             <div class="card p-4 priority-yellow">
               <div class="text-sm font-semibold text-white">Blog: "Do soundproof curtains actually work?"</div>
-              <div class="text-xs text-slate-400 mt-1">Already ranking #7 for "do curtains block sound" — expand and push to #1.</div>
+              <div class="text-xs text-slate-400 mt-1">Already ranking for related terms — expand and push to #1.</div>
             </div>
             <div class="card p-4 priority-yellow">
               <div class="text-sm font-semibold text-white">Set up WooCommerce + Google Shopping feed</div>
@@ -459,11 +372,11 @@
           <div class="space-y-3">
             <div class="card p-4 priority-green">
               <div class="text-sm font-semibold text-white">Pinterest + Instagram content pipeline</div>
-              <div class="text-xs text-slate-400 mt-1">Currently 54 social sessions, 0 conversions. Massive untapped visual channel.</div>
+              <div class="text-xs text-slate-400 mt-1">Currently 23 social sessions, 0 conversions. Massive untapped visual channel.</div>
             </div>
             <div class="card p-4 priority-green">
               <div class="text-sm font-semibold text-white">Backlink outreach campaign</div>
-              <div class="text-xs text-slate-400 mt-1">Domain rank 1,028,255. Target home improvement + acoustics publications.</div>
+              <div class="text-xs text-slate-400 mt-1">Domain rank still low. Target home improvement + acoustics publications.</div>
             </div>
           </div>
         </div>
@@ -472,106 +385,299 @@
 
     <!-- Footer -->
     <div class="mt-8 pt-6 border-t border-[#2d3148] flex items-center justify-between">
-      <div class="text-xs text-slate-600">Data: Google Analytics 4 · Search Console · SEMrush · 90-day window ending May 15, 2026</div>
+      <div class="text-xs text-slate-600" id="footer-label">Data: Google Analytics 4 · Search Console · SEMrush · 30-day window ending May 18, 2026</div>
       <div class="text-xs text-slate-600">acoustic-curtains.com · Quiet Curtains</div>
     </div>
 
   </div>
 
   <script>
-    // Tab switching
-    function setTab(tab) {
-      ['overview','seo','pages','actions'].forEach(t => {
-        document.getElementById('view-' + t).classList.add('hidden');
-        const btn = document.getElementById('tab-' + t);
-        btn.classList.remove('tab-active');
-        btn.classList.add('tab-inactive');
-      });
-      document.getElementById('view-' + tab).classList.remove('hidden');
-      const active = document.getElementById('tab-' + tab);
-      active.classList.add('tab-active');
-      active.classList.remove('tab-inactive');
-      if(tab === 'seo') drawCompetitorChart();
-    }
+    // ── DATA ────────────────────────────────────────────────────────────────
 
-    // Monthly Traffic Chart
-    const ctx = document.getElementById('trafficChart').getContext('2d');
-    new Chart(ctx, {
-      type: 'bar',
-      data: {
-        labels: ['Nov', 'Dec', 'Jan', 'Feb', 'Mar', 'Apr', 'May'],
-        datasets: [
-          {
-            label: 'Paid',
-            data: [870, 1450, 1420, 745, 1648, 1388, 716],
-            backgroundColor: '#4f46e5',
-            borderRadius: 4,
-            stack: 'a'
-          },
-          {
-            label: 'Organic',
-            data: [690, 1150, 1130, 592, 1309, 1102, 569],
-            backgroundColor: '#06b6d4',
-            borderRadius: 4,
-            stack: 'a'
-          },
-          {
-            label: 'Direct',
-            data: [490, 815, 800, 419, 927, 780, 403],
-            backgroundColor: '#8b5cf6',
-            borderRadius: 4,
-            stack: 'a'
-          },
-          {
-            label: 'Other',
-            data: [320, 545, 532, 280, 619, 526, 271],
-            backgroundColor: '#334155',
-            borderRadius: 4,
-            stack: 'a'
-          }
+    const DATASETS = {
+      '30d': {
+        label: 'Apr 18 – May 18, 2026',
+        days: 30,
+        kpi: {
+          sessions: '3,840', conversions: '98', cvr: '2.55%',
+          clicks: '709', impressions: '68.2K', position: '12.8',
+          ctr: '1.04%',
+          ctrBadge: 'badge-yellow', posBadge: 'badge-red',
+          posBadgeText: 'Page 2 edge', ctrBadgeText: '1.04% CTR'
+        },
+        channels: {
+          sessions: [1348, 1127, 876, 337, 152],
+          labels: ['Paid Search','Organic','Direct','Cross-network','Other'],
+          legend: [
+            { label: 'Paid Search',    pct: '35.1%', conv: '40' },
+            { label: 'Organic',        pct: '29.3%', conv: '26' },
+            { label: 'Direct',         pct: '22.8%', conv: '17' },
+            { label: 'Cross-network',  pct: '8.8%',  conv: '10' },
+            { label: 'Other',          pct: '4.0%',  conv: '5'  },
+          ]
+        },
+        daily: {
+          labels: ['4/18','4/19','4/20','4/21','4/22','4/23','4/24','4/25','4/26','4/27','4/28','4/29','4/30',
+                   '5/1','5/2','5/3','5/4','5/5','5/6','5/7','5/8','5/9','5/10','5/11','5/12','5/13','5/14','5/15','5/16','5/17','5/18'],
+          sessions: [87,111,138,142,131,115,119,78,95,134,151,151,138,161,123,143,168,144,144,149,133,113,96,144,127,131,143,117,103,100,13],
+          clicks:   [14,29,34,29,26,22,18,21,20,26,29,24,20,33,19,32,32,21,32,33,26,18,23,28,24,17,24,21,14,null,null]
+        },
+        seo: {
+          clicks: '709', impressions: '68.2K', ctr: '1.04%', position: '12.8',
+          clicksSub: '30 days · Search Console',
+          tableTitle: 'Top Keywords — Last 30 Days',
+          keywords: [
+            { kw: 'acoustic curtains',        clicks: 75,  imp: '2,949', ctr: '2.54%', pos: 12.0, posClass: 'pos-mid',  statusClass: 'badge-yellow', status: 'Push to #5' },
+            { kw: 'quiet curtains',           clicks: 50,  imp: '211',   ctr: '23.7%', pos: 2.1,  posClass: 'pos-good', statusClass: 'badge-green',  status: 'Ranking #1 ✓' },
+            { kw: 'soundproof curtains',      clicks: 29,  imp: '5,318', ctr: '0.55%', pos: 13.3, posClass: 'pos-bad',  statusClass: 'badge-red',    status: '🔴 Page 2' },
+            { kw: 'sound proof curtains',     clicks: 13,  imp: '1,448', ctr: '0.90%', pos: 11.8, posClass: 'pos-mid',  statusClass: 'badge-yellow', status: 'Near page 1' },
+            { kw: 'acoustic curtain',         clicks: 11,  imp: '711',   ctr: '1.55%', pos: 10.7, posClass: 'pos-mid',  statusClass: 'badge-yellow', status: 'Near page 1' },
+            { kw: 'quiet curtain',            clicks: 7,   imp: '34',    ctr: '20.6%', pos: 4.3,  posClass: 'pos-good', statusClass: 'badge-green',  status: 'Strong ✓' },
+            { kw: 'sound blocking curtains',  clicks: 6,   imp: '885',   ctr: '0.68%', pos: 10.3, posClass: 'pos-mid',  statusClass: 'badge-yellow', status: 'Near page 1' },
+            { kw: 'sound dampening curtains', clicks: 6,   imp: '2,047', ctr: '0.29%', pos: 14.9, posClass: 'pos-bad',  statusClass: 'badge-red',    status: '🔴 Page 2' },
+          ]
+        },
+        pages: [
+          { path: '/', label: 'Homepage',                   sessions: 1838, bounce: '31.7%', dur: '1:03', conv: 0,  bounceClass: 'pos-good', statusClass: 'badge-green',  status: 'Good' },
+          { path: '/curtains/sound-blocking/',               sessions: 1227, bounce: '24.5%', dur: '1:29', conv: 0,  bounceClass: 'pos-good', statusClass: 'badge-green',  status: 'Excellent' },
+          { path: '/curtains/acoustic-curtains/',            sessions: 692,  bounce: '25.1%', dur: '1:13', conv: 0,  bounceClass: 'pos-good', statusClass: 'badge-green',  status: 'Excellent' },
+          { path: '/custom/residential-curtains/',           sessions: 508,  bounce: '19.9%', dur: '2:45', conv: 57, bounceClass: 'pos-good', statusClass: 'badge-green',  status: '11.2% CVR 🔥' },
+          { path: '/landing/acoustic-curtains/',             sessions: 398,  bounce: '38.2%', dur: '1:27', conv: 0,  bounceClass: 'pos-mid',  statusClass: 'badge-yellow', status: 'Watch CTR' },
+          { path: '/curtains/commercial-curtains/',          sessions: 236,  bounce: '27.5%', dur: '1:41', conv: 0,  bounceClass: 'pos-good', statusClass: 'badge-green',  status: 'Good' },
+          { path: '/custom/acoustic-curtains/',              sessions: 212,  bounce: '20.3%', dur: '2:11', conv: 24, bounceClass: 'pos-good', statusClass: 'badge-green',  status: '11.3% CVR 🔥' },
+          { path: '/lab-tests/',                             sessions: 211,  bounce: '30.8%', dur: '2:13', conv: 0,  bounceClass: 'pos-good', statusClass: 'badge-yellow', status: 'CTR too low' },
+          { path: '/landing/acoustic-drapes/',               sessions: 170,  bounce: '36.5%', dur: '1:25', conv: 0,  bounceClass: 'pos-mid',  statusClass: 'badge-yellow', status: 'Monitor' },
+          { path: '/portfolio/',                             sessions: 170,  bounce: '11.8%', dur: '1:09', conv: 0,  bounceClass: 'pos-good', statusClass: 'badge-green',  status: 'Lowest bounce ✓' },
         ]
       },
-      options: {
-        responsive: true,
-        plugins: { legend: { display: false }, tooltip: { mode: 'index', intersect: false } },
-        scales: {
-          x: { stacked: true, grid: { color: '#2d3148' }, ticks: { color: '#94a3b8', font: { size: 11 } } },
-          y: { stacked: true, grid: { color: '#2d3148' }, ticks: { color: '#94a3b8', font: { size: 11 } } }
+
+      '90d': {
+        label: 'Feb 15 – May 15, 2026',
+        days: 90,
+        kpi: {
+          sessions: '12,228', conversions: '288', cvr: '2.4%',
+          clicks: '2,343', impressions: '291K', position: '10.4',
+          ctr: '0.80%',
+          ctrBadge: 'badge-red', posBadge: 'badge-yellow',
+          posBadgeText: 'Page 1 edge', ctrBadgeText: '0.80% CTR'
+        },
+        channels: {
+          sessions: [4480, 3585, 2514, 1649],
+          labels: ['Paid Search','Organic','Direct','Other'],
+          legend: [
+            { label: 'Paid Search', pct: '36.6%', conv: '131' },
+            { label: 'Organic',     pct: '29.3%', conv: '70'  },
+            { label: 'Direct',      pct: '20.6%', conv: '49'  },
+            { label: 'Other',       pct: '13.5%', conv: '38'  },
+          ]
+        },
+        daily: {
+          labels: ['Nov','Dec','Jan','Feb','Mar','Apr','May'],
+          sessions: [2370, 3960, 3882, 2036, 4503, 3800, 1959],
+          clicks:   [null, null, null, 592,  1309, 1102, null]
+        },
+        seo: {
+          clicks: '2,343', impressions: '291K', ctr: '0.80%', position: '10.4',
+          clicksSub: '90 days · Search Console',
+          tableTitle: 'Top Keywords — Last 90 Days',
+          keywords: [
+            { kw: 'acoustic curtains',           clicks: 271, imp: '8,910',  ctr: '3.04%', pos: 11.7, posClass: 'pos-mid',  statusClass: 'badge-yellow', status: 'Push to #5' },
+            { kw: 'quiet curtains',              clicks: 136, imp: '604',    ctr: '22.5%', pos: 2.1,  posClass: 'pos-good', statusClass: 'badge-green',  status: 'Ranking #1 ✓' },
+            { kw: 'soundproof curtains',         clicks: 105, imp: '16,102', ctr: '0.65%', pos: 12.1, posClass: 'pos-bad',  statusClass: 'badge-red',    status: '🔴 Page 2' },
+            { kw: 'sound proof curtains',        clicks: 46,  imp: '6,129',  ctr: '0.75%', pos: 9.7,  posClass: 'pos-mid',  statusClass: 'badge-yellow', status: 'Near page 1' },
+            { kw: 'sound dampening curtains',    clicks: 35,  imp: '8,757',  ctr: '0.40%', pos: 13.1, posClass: 'pos-bad',  statusClass: 'badge-red',    status: '🔴 Page 2' },
+            { kw: 'sound blocking curtains',     clicks: 26,  imp: '3,006',  ctr: '0.86%', pos: 10.5, posClass: 'pos-mid',  statusClass: 'badge-yellow', status: 'Near page 1' },
+            { kw: 'noise cancelling curtains',   clicks: 10,  imp: '2,215',  ctr: '0.45%', pos: 14.5, posClass: 'pos-bad',  statusClass: 'badge-red',    status: '🔴 Page 2' },
+            { kw: 'acoustic curtains commercial',clicks: 8,   imp: '59',     ctr: '13.6%', pos: 3.6,  posClass: 'pos-good', statusClass: 'badge-green',  status: 'Strong ✓' },
+          ]
+        },
+        pages: [
+          { path: '/', label: 'Homepage',                   sessions: 5864, bounce: '31.7%', dur: '1:02', conv: 0,  bounceClass: 'pos-good', statusClass: 'badge-green',  status: 'Good' },
+          { path: '/curtains/sound-blocking/',               sessions: 3670, bounce: '20.8%', dur: '1:27', conv: 0,  bounceClass: 'pos-good', statusClass: 'badge-green',  status: 'Excellent' },
+          { path: '/curtains/acoustic-curtains/',            sessions: 2190, bounce: '24.7%', dur: '1:39', conv: 0,  bounceClass: 'pos-good', statusClass: 'badge-green',  status: 'Excellent' },
+          { path: '/custom/residential-curtains/',           sessions: 1664, bounce: '21.6%', dur: '2:57', conv: 0,  bounceClass: 'pos-good', statusClass: 'badge-green',  status: 'Best engagement' },
+          { path: '/landing/acoustic-curtains/',             sessions: 1466, bounce: '37.6%', dur: '1:19', conv: 0,  bounceClass: 'pos-mid',  statusClass: 'badge-yellow', status: 'Watch CTR' },
+          { path: '/curtains/commercial-curtains/',          sessions: 629,  bounce: '26.1%', dur: '1:54', conv: 0,  bounceClass: 'pos-good', statusClass: 'badge-green',  status: 'Good' },
+          { path: '/custom/acoustic-curtains/',              sessions: 611,  bounce: '17.3%', dur: '2:37', conv: 0,  bounceClass: 'pos-good', statusClass: 'badge-green',  status: 'Excellent' },
+          { path: '/lab-tests/',                             sessions: 589,  bounce: '25.1%', dur: '2:44', conv: 0,  bounceClass: 'pos-good', statusClass: 'badge-yellow', status: 'CTR too low' },
+          { path: '/landing/acoustic-drapes/',               sessions: 518,  bounce: '34.0%', dur: '1:26', conv: 0,  bounceClass: 'pos-mid',  statusClass: 'badge-yellow', status: 'Monitor' },
+          { path: '/portfolio/',                             sessions: 476,  bounce: '12.2%', dur: '1:12', conv: 0,  bounceClass: 'pos-good', statusClass: 'badge-green',  status: 'Lowest bounce ✓' },
+        ]
+      }
+    };
+
+    // ── STATE ────────────────────────────────────────────────────────────────
+    let activePeriod = '30d';
+    let activeTab = 'overview';
+    let trafficChartInst = null;
+    let channelChartInst = null;
+    let competitorDrawn = false;
+
+    // ── PERIOD SWITCHING ─────────────────────────────────────────────────────
+    function setPeriod(p) {
+      if (!DATASETS[p]) return; // disabled periods
+      activePeriod = p;
+      const d = DATASETS[p];
+
+      // Update active button
+      document.querySelectorAll('.period-btn').forEach(b => b.classList.remove('active'));
+      const btn = document.getElementById('pbtn-' + p);
+      if (btn) btn.classList.add('active');
+
+      // Period label
+      document.getElementById('period-label').textContent = d.label + '  ·  ' + d.days + ' days';
+      document.getElementById('footer-label').textContent =
+        'Data: Google Analytics 4 · Search Console · SEMrush · ' + d.days + '-day window ending ' + d.label.split('–')[1].trim();
+
+      // KPIs
+      document.getElementById('kpi-sessions').textContent = d.kpi.sessions;
+      document.getElementById('kpi-conv').textContent = d.kpi.conversions;
+      document.getElementById('kpi-cvr').textContent = d.kpi.cvr;
+      document.getElementById('kpi-clicks').textContent = d.kpi.clicks;
+      document.getElementById('kpi-imp').textContent = d.kpi.impressions;
+      document.getElementById('kpi-pos').textContent = d.kpi.position;
+
+      // Badge on impressions kpi
+      document.getElementById('kpi-imp-sub').innerHTML =
+        `<span class="text-xs ${d.kpi.ctrBadge} px-1.5 py-0.5 rounded text-xs">${d.kpi.ctrBadgeText}</span>`;
+      document.getElementById('kpi-pos-sub').innerHTML =
+        `<span class="text-xs ${d.kpi.posBadge} px-1.5 py-0.5 rounded text-xs">${d.kpi.posBadgeText}</span>`;
+
+      // Channel legend
+      const legend = document.getElementById('channel-legend');
+      legend.innerHTML = d.channels.legend.map(c =>
+        `<div class="flex justify-between text-xs"><span class="text-slate-400">${c.label}</span><span class="text-white font-medium">${c.pct} · ${c.conv} conv</span></div>`
+      ).join('');
+
+      // Charts
+      updateTrafficChart(d);
+      updateChannelChart(d);
+
+      // SEO tab
+      const s = d.seo;
+      document.getElementById('seo-clicks').textContent = s.clicks;
+      document.getElementById('seo-imp').textContent = s.impressions;
+      document.getElementById('seo-ctr').textContent = s.ctr;
+      document.getElementById('seo-pos').textContent = s.position;
+      document.getElementById('seo-clicks-sub').textContent = s.clicksSub;
+      document.getElementById('kw-table-title').textContent = s.tableTitle;
+      renderKeywordTable(s.keywords);
+
+      // Pages tab
+      document.getElementById('pages-table-title').textContent = 'Top Pages — Last ' + d.days + ' Days';
+      renderPagesTable(d.pages);
+
+      // Chart title
+      document.getElementById('chart-title').textContent = 'Daily Traffic — Last ' + d.days + ' Days';
+    }
+
+    // ── CHARTS ───────────────────────────────────────────────────────────────
+    function updateTrafficChart(d) {
+      if (trafficChartInst) { trafficChartInst.destroy(); trafficChartInst = null; }
+      const ctx = document.getElementById('trafficChart').getContext('2d');
+      trafficChartInst = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: d.daily.labels,
+          datasets: [
+            {
+              label: 'Sessions',
+              data: d.daily.sessions,
+              borderColor: '#4f46e5',
+              backgroundColor: 'rgba(79,70,229,0.08)',
+              borderWidth: 2,
+              pointRadius: 2,
+              fill: true,
+              tension: 0.3,
+              yAxisID: 'y'
+            },
+            {
+              label: 'Organic Clicks',
+              data: d.daily.clicks,
+              borderColor: '#06b6d4',
+              backgroundColor: 'rgba(6,182,212,0.06)',
+              borderWidth: 2,
+              pointRadius: 2,
+              fill: true,
+              tension: 0.3,
+              spanGaps: true,
+              yAxisID: 'y'
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          interaction: { mode: 'index', intersect: false },
+          plugins: { legend: { display: false }, tooltip: { mode: 'index', intersect: false } },
+          scales: {
+            x: { grid: { color: '#1e2133' }, ticks: { color: '#64748b', font: { size: 10 }, maxRotation: 0,
+              callback: function(val, i) { return i % 5 === 0 ? this.getLabelForValue(val) : ''; }
+            }},
+            y: { grid: { color: '#1e2133' }, ticks: { color: '#64748b', font: { size: 10 } }, beginAtZero: true }
+          }
         }
-      }
-    });
+      });
+    }
 
-    // Channel Donut
-    const ctx2 = document.getElementById('channelChart').getContext('2d');
-    new Chart(ctx2, {
-      type: 'doughnut',
-      data: {
-        labels: ['Paid Search', 'Organic', 'Direct', 'Other'],
-        datasets: [{
-          data: [4480, 3585, 2514, 1649],
-          backgroundColor: ['#4f46e5', '#06b6d4', '#8b5cf6', '#334155'],
-          borderWidth: 0,
-          hoverOffset: 4
-        }]
-      },
-      options: {
-        cutout: '70%',
-        plugins: { legend: { display: false } }
-      }
-    });
+    function updateChannelChart(d) {
+      if (channelChartInst) { channelChartInst.destroy(); channelChartInst = null; }
+      const ctx2 = document.getElementById('channelChart').getContext('2d');
+      channelChartInst = new Chart(ctx2, {
+        type: 'doughnut',
+        data: {
+          labels: d.channels.labels,
+          datasets: [{
+            data: d.channels.sessions,
+            backgroundColor: ['#4f46e5','#06b6d4','#8b5cf6','#334155','#1e293b'],
+            borderWidth: 0,
+            hoverOffset: 4
+          }]
+        },
+        options: { cutout: '70%', plugins: { legend: { display: false } } }
+      });
+    }
 
-    // Competitor Chart (lazy)
+    // ── TABLES ───────────────────────────────────────────────────────────────
+    function renderKeywordTable(keywords) {
+      document.getElementById('kw-tbody').innerHTML = keywords.map(k => `
+        <tr>
+          <td class="py-3 text-white font-medium">${k.kw}</td>
+          <td class="py-3 text-right text-slate-300">${k.clicks}</td>
+          <td class="py-3 text-right text-slate-300">${k.imp}</td>
+          <td class="py-3 text-right text-slate-300">${k.ctr}</td>
+          <td class="py-3 text-right ${k.posClass} font-semibold">#${k.pos}</td>
+          <td class="py-3"><span class="${k.statusClass} px-2 py-0.5 rounded text-xs">${k.status}</span></td>
+        </tr>`).join('');
+    }
+
+    function renderPagesTable(pages) {
+      document.getElementById('pages-tbody').innerHTML = pages.map(p => {
+        const convCell = p.conv > 0
+          ? `<td class="py-3 text-right pos-good font-semibold">${p.conv}</td>`
+          : `<td class="py-3 text-right text-slate-500">—</td>`;
+        return `
+        <tr>
+          <td class="py-3 text-white font-medium">${p.path === '/' ? '/ <span class="text-slate-500 font-normal">(Homepage)</span>' : p.path}</td>
+          <td class="py-3 text-right text-slate-300">${p.sessions.toLocaleString()}</td>
+          <td class="py-3 text-right ${p.bounceClass}">${p.bounce}</td>
+          <td class="py-3 text-right text-slate-300">${p.dur}</td>
+          ${convCell}
+          <td class="py-3"><span class="${p.statusClass} px-2 py-0.5 rounded text-xs">${p.status}</span></td>
+        </tr>`;
+      }).join('');
+    }
+
+    // ── COMPETITOR CHART ─────────────────────────────────────────────────────
     function drawCompetitorChart() {
-      const el = document.getElementById('competitorChart');
-      if (!el || el.dataset.drawn) return;
-      el.dataset.drawn = true;
-      new Chart(el.getContext('2d'), {
+      if (competitorDrawn) return;
+      competitorDrawn = true;
+      new Chart(document.getElementById('competitorChart').getContext('2d'), {
         type: 'bar',
         data: {
           labels: ['You', 'sound-escape.co', 'izzysoundproofing', 'mmtacoustix', 'gastage.com', 'saaria.com', 'moondream'],
           datasets: [{
-            label: 'Monthly Organic Traffic',
-            data: [1070, 2509, 505, 482, 5451, 7095, 15627],
+            label: 'Monthly Organic Traffic (SEMrush)',
+            data: [1056, 2509, 505, 482, 5451, 7095, 15627],
             backgroundColor: ['#4f46e5','#334155','#334155','#334155','#334155','#334155','#ef4444'],
             borderRadius: 4
           }]
@@ -580,12 +686,30 @@
           indexAxis: 'y',
           plugins: { legend: { display: false } },
           scales: {
-            x: { grid: { color: '#2d3148' }, ticks: { color: '#94a3b8', font: { size: 11 } } },
-            y: { grid: { color: '#2d3148' }, ticks: { color: '#94a3b8', font: { size: 11 } } }
+            x: { grid: { color: '#1e2133' }, ticks: { color: '#64748b', font: { size: 11 } } },
+            y: { grid: { color: '#1e2133' }, ticks: { color: '#94a3b8', font: { size: 11 } } }
           }
         }
       });
     }
+
+    // ── TAB SWITCHING ─────────────────────────────────────────────────────────
+    function setTab(tab) {
+      ['overview','seo','pages','actions'].forEach(t => {
+        document.getElementById('view-' + t).classList.add('hidden');
+        const btn = document.getElementById('tab-' + t);
+        btn.classList.remove('tab-active');
+        btn.classList.add('tab-inactive');
+      });
+      document.getElementById('view-' + tab).classList.remove('hidden');
+      document.getElementById('tab-' + tab).classList.add('tab-active');
+      document.getElementById('tab-' + tab).classList.remove('tab-inactive');
+      if (tab === 'seo') drawCompetitorChart();
+      activeTab = tab;
+    }
+
+    // ── INIT ──────────────────────────────────────────────────────────────────
+    setPeriod('30d');
   </script>
 </body>
 </html>
