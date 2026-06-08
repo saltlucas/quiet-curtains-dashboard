@@ -137,6 +137,17 @@
         </div>
       </div>
 
+      <!-- Year-ago benchmark banner ("time to beat") -->
+      <div class="card px-5 py-3 mb-6" id="ly-banner">
+        <div class="flex items-center justify-between flex-wrap gap-2">
+          <div class="flex items-center gap-2 text-xs text-slate-500">
+            <span class="text-amber-400">🎯</span>
+            <span>Benchmark — same window last year (<span id="ly-label" class="text-slate-300">May 9 – Jun 8, 2025</span>), one-time pull, fixed reference:</span>
+          </div>
+          <div class="flex items-center gap-4 text-xs flex-wrap" id="ly-stats"></div>
+        </div>
+      </div>
+
       <!-- Charts Row -->
       <div class="grid grid-cols-3 gap-4 mb-6">
 
@@ -415,6 +426,17 @@
           impressions: { pct: -3.1,  raw: '69.5K → 67.3K (−2,158)' },
           position:    { pct: +5.0,  raw: '12.6 → 13.2 (+0.6, worse)', inverse: true },
         },
+        // ── Year-ago benchmark ── one-time pull, same calendar window last year (May 9 – Jun 8, 2025).
+        // This is a fixed "time to beat" reference, not a live-refreshing comparison.
+        vsLastYear: {
+          label: 'May 9 – Jun 8, 2025',
+          sessions:    { value: '7,321',  pct: -48.0, raw: '7,321 → 3,809' },
+          conversions: { value: '204',    pct: -53.4, raw: '204 → 95' },
+          cvr:         { value: '2.79%',  pct: -10.5, raw: '2.79% → 2.49%' },
+          clicks:      { value: '1,257',  pct: -47.1, raw: '1,257 → 665' },
+          impressions: { value: '109K',   pct: -38.2, raw: '109K → 67.3K' },
+          position:    { value: '20.6',   pct: -36.0, raw: '20.6 → 13.2', inverse: true, improvedNote: 'big SEO win — rank nearly halved' },
+        },
         channels: {
           sessions: [1336, 1064, 697, 447, 144],
           labels: ['Paid Search','Organic','Direct','Cross-network','Other'],
@@ -574,6 +596,28 @@
       document.getElementById('kpi-pos-sub').innerHTML =
         trendBadge(cmp.position, pl) +
         `<span class="text-xs ${d.kpi.posBadge} px-1.5 py-0.5 rounded text-xs ml-2">${d.kpi.posBadgeText}</span>`;
+
+      // Year-ago benchmark banner ("time to beat")
+      const banner = document.getElementById('ly-banner');
+      if (d.vsLastYear) {
+        banner.style.display = '';
+        document.getElementById('ly-label').textContent = d.vsLastYear.label;
+        const lyKeys = [
+          ['sessions', 'Sessions'], ['conversions', 'Conversions'], ['cvr', 'CVR'],
+          ['clicks', 'Clicks'], ['impressions', 'Impressions'], ['position', 'Avg Pos']
+        ];
+        document.getElementById('ly-stats').innerHTML = lyKeys.map(([key, label]) => {
+          const ly = d.vsLastYear[key];
+          if (!ly) return '';
+          const up = ly.pct >= 0;
+          const good = ly.inverse ? !up : up;
+          const arrow = up ? '↑' : '↓';
+          const cls = good ? 'trend-up' : 'trend-down';
+          return `<span title="${ly.raw}"><span class="text-slate-500">${label} was</span> <span class="text-slate-300 font-medium">${ly.value}</span> <span class="${cls}">${arrow} ${Math.abs(ly.pct).toFixed(1)}%</span></span>`;
+        }).join('<span class="text-slate-700">·</span>');
+      } else {
+        banner.style.display = 'none';
+      }
 
       // Channel legend
       const legend = document.getElementById('channel-legend');
