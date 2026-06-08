@@ -146,6 +146,8 @@
           </div>
           <div class="flex items-center gap-4 text-xs flex-wrap" id="ly-stats"></div>
         </div>
+        <div class="mt-2.5 pt-2.5 border-t border-[#2d3148] text-xs text-slate-400 leading-relaxed" id="ly-insight"></div>
+        <div class="mt-2 flex items-center gap-3 text-xs flex-wrap" id="ly-channels"></div>
       </div>
 
       <!-- Charts Row -->
@@ -436,6 +438,14 @@
           clicks:      { value: '1,257',  pct: -47.1, raw: '1,257 → 665' },
           impressions: { value: '109K',   pct: -38.2, raw: '109K → 67.3K' },
           position:    { value: '20.6',   pct: -36.0, raw: '20.6 → 13.2', inverse: true, improvedNote: 'big SEO win — rank nearly halved' },
+          // Channel-level YoY pull — explains *why* total traffic is down (confirmed w/ team: paid budget cut ~50%)
+          channels: [
+            { label: 'Paid Search',   ly: '4,194 sessions / 133 conv', now: '1,338 / 34', pct: -68 },
+            { label: 'Organic Search',ly: '1,792 sessions / 56 conv',  now: '1,066 / 29', pct: -40 },
+            { label: 'Direct',        ly: '779 sessions / 10 conv',    now: '698 / 20',   pct: -10 },
+            { label: 'Referral',      ly: '357 sessions / 2 conv',     now: '102 / 2',    pct: -71 },
+          ],
+          insight: 'Confirmed: paid media budget was cut roughly in half this year. Paid Search sessions fell 68% YoY (4,194 → 1,338) — that single channel explains ~80% of the entire year-over-year traffic decline. Organic also dipped (1,792 → 1,066) but its average position improved (20.6 → 13.2), so the SEO foundation is healthier than the raw traffic number suggests — it\'s a demand/budget story, not a rankings problem.'
         },
         channels: {
           sessions: [1336, 1064, 697, 447, 144],
@@ -615,6 +625,31 @@
           const cls = good ? 'trend-up' : 'trend-down';
           return `<span title="${ly.raw}"><span class="text-slate-500">${label} was</span> <span class="text-slate-300 font-medium">${ly.value}</span> <span class="${cls}">${arrow} ${Math.abs(ly.pct).toFixed(1)}%</span></span>`;
         }).join('<span class="text-slate-700">·</span>');
+
+        // Insight line — the "why" behind the YoY numbers
+        const insightEl = document.getElementById('ly-insight');
+        if (d.vsLastYear.insight) {
+          insightEl.innerHTML = `<span class="text-amber-400">💡</span> ${d.vsLastYear.insight}`;
+          insightEl.style.display = '';
+        } else {
+          insightEl.style.display = 'none';
+        }
+
+        // Channel-level YoY breakdown — explains where the swing came from
+        const chEl = document.getElementById('ly-channels');
+        if (d.vsLastYear.channels) {
+          chEl.innerHTML = d.vsLastYear.channels.map(c => {
+            const cls = c.pct >= 0 ? 'trend-up' : 'trend-down';
+            return `<span class="px-2 py-1 rounded" style="background:#11141c; border:1px solid #2d3148;" title="Last year: ${c.ly}  →  Now: ${c.now}">
+                      <span class="text-slate-300 font-medium">${c.label}</span>
+                      <span class="text-slate-500"> ${c.ly.split(' ')[0]} → ${c.now.split(' ')[0]}</span>
+                      <span class="${cls}"> (${c.pct > 0 ? '+' : ''}${c.pct}%)</span>
+                    </span>`;
+          }).join('');
+          chEl.style.display = '';
+        } else {
+          chEl.style.display = 'none';
+        }
       } else {
         banner.style.display = 'none';
       }
