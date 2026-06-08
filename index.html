@@ -124,14 +124,14 @@
         <div class="kpi-card col-span-1">
           <div class="section-header">Impressions</div>
           <div class="text-2xl font-bold text-white" id="kpi-imp">68.2K</div>
-          <div class="flex items-center gap-1 mt-1" id="kpi-imp-sub">
+          <div class="flex items-center gap-1 mt-1 flex-wrap" id="kpi-imp-sub">
             <span class="text-xs badge-yellow px-1.5 py-0.5 rounded text-xs">1.04% CTR</span>
           </div>
         </div>
         <div class="kpi-card col-span-1">
           <div class="section-header">Avg Position</div>
           <div class="text-2xl font-bold text-white" id="kpi-pos">12.8</div>
-          <div class="flex items-center gap-1 mt-1" id="kpi-pos-sub">
+          <div class="flex items-center gap-1 mt-1 flex-wrap" id="kpi-pos-sub">
             <span class="text-xs badge-red px-1.5 py-0.5 rounded text-xs">Page 2 edge</span>
           </div>
         </div>
@@ -405,6 +405,16 @@
           ctrBadge: 'badge-yellow', posBadge: 'badge-red',
           posBadgeText: 'Page 2', ctrBadgeText: '0.99% CTR'
         },
+        compare: {
+          // vs. prior 30-day window (Apr 9 – May 8, 2026) — same metric, same length, no overlap
+          priorLabel: 'Apr 9 – May 8',
+          sessions:    { pct: -5.4,  raw: '4,028 → 3,809 (−219)' },
+          conversions: { pct: +1.1,  raw: '94 → 95 (+1)' },
+          cvr:         { pct: +6.9,  raw: '2.33% → 2.49% (+0.16pp)' },
+          clicks:      { pct: -16.1, raw: '793 → 665 (−128)' },
+          impressions: { pct: -3.1,  raw: '69.5K → 67.3K (−2,158)' },
+          position:    { pct: +5.0,  raw: '12.6 → 13.2 (+0.6, worse)', inverse: true },
+        },
         channels: {
           sessions: [1336, 1064, 697, 447, 144],
           labels: ['Paid Search','Organic','Direct','Cross-network','Other'],
@@ -514,6 +524,19 @@
     let competitorDrawn = false;
 
     // ── PERIOD SWITCHING ─────────────────────────────────────────────────────
+    // Renders a consistent "↑/↓ X.X% vs prior period" trend line.
+    // `inverse` flips the color logic for metrics where "up" is bad (e.g. avg position — higher number = worse rank).
+    function trendBadge(cmp, priorLabel, title) {
+      if (!cmp) return '<span class="text-xs text-slate-500">—</span>';
+      const pct = cmp.pct;
+      const up = pct >= 0;
+      const good = cmp.inverse ? !up : up;
+      const arrow = up ? '↑' : '↓';
+      const cls = good ? 'trend-up' : 'trend-down';
+      const label = priorLabel ? ` vs prior 30d (${priorLabel})` : ' vs prior 30d';
+      return `<span class="text-xs ${cls}" title="${cmp.raw || ''}">${arrow} ${Math.abs(pct).toFixed(1)}%${label}</span>`;
+    }
+
     function setPeriod(p) {
       if (!DATASETS[p]) return; // disabled periods
       activePeriod = p;
@@ -537,11 +560,20 @@
       document.getElementById('kpi-imp').textContent = d.kpi.impressions;
       document.getElementById('kpi-pos').textContent = d.kpi.position;
 
-      // Badge on impressions kpi
+      // Period-over-period trend lines — same metric, same window length, no overlap.
+      // Hover any trend line to see the raw before → after numbers.
+      const cmp = d.compare || {};
+      const pl = cmp.priorLabel;
+      document.getElementById('kpi-sessions-sub').innerHTML = trendBadge(cmp.sessions, pl);
+      document.getElementById('kpi-conv-sub').innerHTML     = trendBadge(cmp.conversions, pl);
+      document.getElementById('kpi-cvr-sub').innerHTML      = trendBadge(cmp.cvr, pl);
+      document.getElementById('kpi-clicks-sub').innerHTML   = trendBadge(cmp.clicks, pl);
       document.getElementById('kpi-imp-sub').innerHTML =
-        `<span class="text-xs ${d.kpi.ctrBadge} px-1.5 py-0.5 rounded text-xs">${d.kpi.ctrBadgeText}</span>`;
+        trendBadge(cmp.impressions, pl) +
+        `<span class="text-xs ${d.kpi.ctrBadge} px-1.5 py-0.5 rounded text-xs ml-2">${d.kpi.ctrBadgeText}</span>`;
       document.getElementById('kpi-pos-sub').innerHTML =
-        `<span class="text-xs ${d.kpi.posBadge} px-1.5 py-0.5 rounded text-xs">${d.kpi.posBadgeText}</span>`;
+        trendBadge(cmp.position, pl) +
+        `<span class="text-xs ${d.kpi.posBadge} px-1.5 py-0.5 rounded text-xs ml-2">${d.kpi.posBadgeText}</span>`;
 
       // Channel legend
       const legend = document.getElementById('channel-legend');
